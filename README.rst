@@ -18,7 +18,7 @@ First, please download the
 `Win32 <https://github.com/uyjulian/oggvorbis2fsb5/releases/latest/download/oggvorbis2fsb5-win32.zip>`_
 build.
 
-This utility is used from the command line:: bash
+This utility is used from the command line::
 
     /path/to/oggvorbis2fsb5 /path/to/input/file.ogg /path/to/output/file.fsb 33333 44444
 
