@@ -18,9 +18,8 @@ First, please download the
 `Win32 <https://github.com/uyjulian/oggvorbis2fsb5/releases/download/latest/oggvorbis2fsb5-win32.zip>`_
 build.
 
-This utility is used from the command line:
+This utility is used from the command line:: bash
 
-.. code-block:: bash
     /path/to/oggvorbis2fsb5 /path/to/input/file.ogg /path/to/output/file.fsb 33333 44444
 
 The arguments ``33333`` and ``44444`` are optional and specify the loop start and end points.
