@@ -51,6 +51,7 @@ oggvorbis2fsb5_src = [
 ]
 
 oggvorbis2fsb5_includes = [
+	'include',
 	'external/ogg/include',
 	'external/vorbis/include',
 ]
