@@ -1,0 +1,8 @@
+_obj
+*.exe
+.DS_Store
+Thumbs.db
+*.ogg
+*.fsb
+build
+build-*
