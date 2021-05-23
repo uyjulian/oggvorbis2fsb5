@@ -13,9 +13,9 @@ How to use
 ==========
 
 First, please download the
-`macOS <https://github.com/uyjulian/oggvorbis2fsb5/releases/download/latest/oggvorbis2fsb5-macos.zip>`_,
-`Ubuntu <https://github.com/uyjulian/oggvorbis2fsb5/releases/download/latest/oggvorbis2fsb5-ubuntu.zip>`_, or
-`Win32 <https://github.com/uyjulian/oggvorbis2fsb5/releases/download/latest/oggvorbis2fsb5-win32.zip>`_
+`macOS <https://github.com/uyjulian/oggvorbis2fsb5/releases/latest/download/oggvorbis2fsb5-macos.zip>`_,
+`Ubuntu <https://github.com/uyjulian/oggvorbis2fsb5/releases/latest/download/oggvorbis2fsb5-ubuntu.zip>`_, or
+`Win32 <https://github.com/uyjulian/oggvorbis2fsb5/releases/latest/download/oggvorbis2fsb5-win32.zip>`_
 build.
 
 This utility is used from the command line:: bash
