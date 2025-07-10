@@ -19,19 +19,30 @@ on:
       - "**.in"
       - "**.yml"
 
+env:
+  CMAKE_GENERATOR: Ninja
+  HOMEBREW_NO_ANALYTICS: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_INSTALL_UPGRADE: 1
+  HOMEBREW_NO_INSTALL_CLEANUP: 1
+  DEBIAN_FRONTEND: noninteractive
+  TZ: Japan
 jobs:
   build-ubuntu:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: ubuntu:20.04
+      options: "--user 0"
     steps:
-      - uses: actions/checkout@v2
+      - run: apt-get -y update && apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install build-essential git
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: sudo apt-get update
-      - run: sudo apt-get install build-essential
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-      - uses: actions/cache@v1
+          python-version: '3.13.3'
+      - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip
@@ -40,24 +51,27 @@ jobs:
       - run: python -m pip install --upgrade meson ninja
       - run: meson setup build/
       - run: meson compile -C build
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
-          name: oggvorbis2fsb5-ubuntu
+          name: ${{ github.event.repository.name }}-ubuntu
           path: build/oggvorbis2fsb5
   build-win32:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: ubuntu:20.04
+      options: "--user 0"
     steps:
-      - uses: actions/checkout@v2
+      - run: apt-get -y update && apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install build-essential mingw-w64 git
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: sudo apt-get update
-      - run: sudo apt-get install build-essential mingw-w64
-      - run: sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
-      - run: sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
-      - uses: actions/setup-python@v1
+      - run: update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+      - run: update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-      - uses: actions/cache@v1
+          python-version: '3.13.3'
+      - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip
@@ -66,20 +80,21 @@ jobs:
       - run: python -m pip install --upgrade meson ninja
       - run: meson setup build/ --cross-file ./external/meson_toolchains/mingw32_meson.ini
       - run: meson compile -C build
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
-          name: oggvorbis2fsb5-win32
+          name: ${{ github.event.repository.name }}-win32
           path: build/oggvorbis2fsb5.exe
   build-macos:
-    runs-on: macos-10.15
+    runs-on: macos-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip
@@ -88,36 +103,31 @@ jobs:
       - run: python -m pip install --upgrade meson ninja
       - run: meson setup build/
       - run: meson compile -C build
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
-          name: oggvorbis2fsb5-macos
+          name: ${{ github.event.repository.name }}-macos
           path: build/oggvorbis2fsb5
 
   create-release:
     needs: [build-ubuntu, build-win32, build-macos]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: ubuntu:20.04
+      options: "--user 0"
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-    - name: Download ubuntu artifact
-      uses: actions/download-artifact@v1
-      with:
-        name: oggvorbis2fsb5-ubuntu
+    - name: Download all artifact
+      uses: actions/download-artifact@v4
 
-    - name: Download win32 artifact
-      uses: actions/download-artifact@v1
-      with:
-        name: oggvorbis2fsb5-win32
-
-    - name: Download macos artifact
-      uses: actions/download-artifact@v1
-      with:
-        name: oggvorbis2fsb5-macos
+    - name: Set up p7zip
+      run: "apt-get -y update && apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install p7zip-full"
 
     - name: Prepare artifacts for release
       run: |
-        7z a -tzip oggvorbis2fsb5-ubuntu.zip oggvorbis2fsb5-ubuntu/*
-        7z a -tzip oggvorbis2fsb5-win32.zip oggvorbis2fsb5-win32/*
-        7z a -tzip oggvorbis2fsb5-macos.zip oggvorbis2fsb5-macos/*
+        7z a -tzip ${{ github.event.repository.name }}-ubuntu.zip ${{ github.event.repository.name }}-ubuntu/*
+        7z a -tzip ${{ github.event.repository.name }}-win32.zip ${{ github.event.repository.name }}-win32/*
+        7z a -tzip ${{ github.event.repository.name }}-macos.zip ${{ github.event.repository.name }}-macos/*
 
     - name: Create release
       if: startsWith(github.ref, 'refs/tags/v')
@@ -126,6 +136,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: "${{ contains(github.ref, '-rc') }}"
         files: |
-          oggvorbis2fsb5-ubuntu.zip
-          oggvorbis2fsb5-win32.zip
-          oggvorbis2fsb5-macos.zip
+          ${{ github.event.repository.name }}-ubuntu.zip
+          ${{ github.event.repository.name }}-win32.zip
+          ${{ github.event.repository.name }}-macos.zip
