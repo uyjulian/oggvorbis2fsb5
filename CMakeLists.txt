@@ -39,8 +39,7 @@ add_executable(oggvorbis2fsb5
 set_target_properties(oggvorbis2fsb5 PROPERTIES C_STANDARD 11)
 
 if(WIN32)
-	target_compile_definitions(oggvorbis2fsb5 PUBLIC UNICODE _UNICODE)
-	target_link_options(oggvorbis2fsb5 PUBLIC -static -static-libgcc -municode)
+	target_link_options(oggvorbis2fsb5 PUBLIC -static -static-libgcc)
 endif()
 if((${CMAKE_SYSTEM_NAME} MATCHES "Linux") OR (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"))
 	target_link_libraries(oggvorbis2fsb5 m)
