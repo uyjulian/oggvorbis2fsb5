@@ -1,6 +1,3 @@
-[submodule "external/meson_toolchains"]
-	path = external/meson_toolchains
-	url = https://github.com/uyjulian/meson_toolchains.git
 [submodule "external/vorbis"]
 	path = external/vorbis
 	url = https://github.com/xiph/vorbis.git
